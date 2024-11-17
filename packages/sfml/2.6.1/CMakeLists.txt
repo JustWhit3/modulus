@@ -1,7 +1,7 @@
-# Finding the package
+cmake_minimum_required(VERSION 3.15)
+project(build)
 find_package(SFML 2.6.1 COMPONENTS system window graphics audio)
 
-# Fetching the package if not found
 if(NOT SFML_FOUND)
     include(FetchContent)
 
@@ -11,8 +11,8 @@ if(NOT SFML_FOUND)
       GIT_TAG 2.6.1
     )
 
-    set(SFML_BUILD_NETWORK FALSE)
-
     message(STATUS "Fetching SFML...")
     FetchContent_MakeAvailable(SFML)
+else ()
+    message(STATUS "SFML 2.6.1 is already installed.")
 endif()
