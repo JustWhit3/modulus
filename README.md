@@ -1,6 +1,6 @@
 # modulus
 A C++ package manager totally based on CMake
 
-Serve Python (3.12?)
+Python 3.12 (at least)
 
-Richiesta almeno cmake 3.15
+CMake 3.15 (at least)

@@ -7,12 +7,13 @@ import shutil
 
 # Personal modules
 import my_logger
+import my_shell
 
 
-def check_if_in_archive(base_path, package, version):
-    if not os.path.isdir(f"{base_path}/{package}/{version}"):
+def check_if_in_archive(base_path, package):
+    if not os.path.isdir(f"{base_path}/{package}"):
         my_logger.logger.error(
-            f'"{package}" package v{version} is not in the archive. Please visit https://github.com/JustWhit3/modulus/tree/main/packages for a list of the available packages and send a PR if you want.'
+            f'"{package}" package is not in the archive. Please visit https://github.com/JustWhit3/modulus/tree/main/packages for a list of the available packages and send a PR if you want.'
         )
         sys.exit()
 
@@ -37,30 +38,36 @@ def install_package(base_path, package, version, install):
 
     for package in os.listdir(base_path):
         if package == package:
-            for version in os.listdir(f"{base_path}/{package}"):
-                if version == version:
-                    complete_path = f"{base_path}/{package}/{version}"
+            complete_path = f"{base_path}/{package}"
 
-                    # Configure package
-                    my_logger.logger.info("configuring...")
-                    subprocess.run(configure, check=True, cwd=complete_path)
+            # Generate template file
+            my_logger.logger.info("creating CMakeLists.txt...")
+            my_shell.generate_cmakelists(
+                f"{complete_path}/CMakeLists.txt.in",
+                f"{complete_path}/CMakeLists.txt",
+                version,
+            )
 
-                    # Check if already installed
-                    is_installed = is_package_installed(complete_path)
-                    if not is_installed:
+            # Configure package
+            my_logger.logger.info("configuring...")
+            subprocess.run(configure, check=True, cwd=complete_path)
 
-                        # Build package
-                        my_logger.logger.info("building...")
-                        subprocess.run(build, check=True, cwd=complete_path)
+            # Check if already installed
+            is_installed = is_package_installed(complete_path)
+            if not is_installed:
 
-                        # Install package
-                        if install == "yes":
-                            my_logger.logger.info("installing...")
-                            subprocess.run(install, check=True, cwd=complete_path)
-                    else:
-                        my_logger.logger.info("Package is already installed. Skipping.")
+                # Build package
+                my_logger.logger.info("building...")
+                subprocess.run(build, check=True, cwd=complete_path)
 
-                    # Remove build dir
-                    my_logger.logger.info("cleaning...")
-                    shutil.rmtree(f"{complete_path}/build")
-                    my_logger.logger.info("process complete.")
+                # Install package
+                if install == "yes":
+                    my_logger.logger.info("installing...")
+                    subprocess.run(install, check=True, cwd=complete_path)
+            else:
+                my_logger.logger.info("Package is already installed. Skipping.")
+
+            # Remove build dir
+            my_logger.logger.info("cleaning...")
+            shutil.rmtree(f"{complete_path}/build")
+            my_logger.logger.info("process complete.")

@@ -13,7 +13,7 @@ def main():
     base_path = "packages"
 
     # Check if C++ library is in the archive
-    core.check_if_in_archive(base_path, args.package, args.version)
+    core.check_if_in_archive(base_path, args.package)
 
     # Install the library
     if my_shell.is_admin():
