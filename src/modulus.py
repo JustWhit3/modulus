@@ -9,13 +9,10 @@ import core
 
 
 def main():
-    # Basic declarations
     base_path = "packages"
 
-    # Check if C++ library is in the archive
     core.check_if_in_archive(base_path, args.package)
 
-    # Install the library
     if my_shell.is_admin():
         core.install_package(base_path, args.package, args.version, args.install)
     else:
@@ -23,7 +20,6 @@ def main():
 
 
 if __name__ == "__main__":
-    # Parser settings
     parser = argparse.ArgumentParser(
         description="Modulus is an open-source package manager for C++ libraries."
     )
@@ -50,5 +46,4 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    # Main code
     main()

@@ -31,43 +31,52 @@ def is_package_installed(path):
     return False
 
 
+def generate_template(path, version):
+    my_logger.logger.info("creating CMakeLists.txt...")
+    my_shell.generate_cmakelists(
+        f"{path}/CMakeLists.txt.in",
+        f"{path}/CMakeLists.txt",
+        version,
+    )
+
+
+def configure_pkg(path):
+    my_logger.logger.info("configuring...")
+    subprocess.run(["cmake", "-B", "build"], check=True, cwd=path)
+
+
+def build_pkg(path):
+    my_logger.logger.info("building...")
+    subprocess.run(["cmake", "--build", "build"], check=True, cwd=path)
+
+
+def install_pkg(path, install):
+    if install == "yes":
+        my_logger.logger.info("installing...")
+        subprocess.run(
+            ["cmake", "--build", "build", "--target", "install"], check=True, cwd=path
+        )
+
+
+def clean_env(path):
+    my_logger.logger.info("cleaning...")
+    shutil.rmtree(f"{path}/build")
+    my_logger.logger.info("process complete.")
+
+
 def install_package(base_path, package, version, install):
-    configure = ["cmake", "-B", "build"]
-    build = ["cmake", "--build", "build"]
-    install = ["cmake", "--build", "build", "--target", "install"]
 
-    for package in os.listdir(base_path):
-        if package == package:
-            complete_path = f"{base_path}/{package}"
+    for pkg in os.listdir(base_path):
+        if pkg == package:
+            complete_path = f"{base_path}/{pkg}"
+            generate_template(complete_path, version)
+            configure_pkg(complete_path)
 
-            # Generate template file
-            my_logger.logger.info("creating CMakeLists.txt...")
-            my_shell.generate_cmakelists(
-                f"{complete_path}/CMakeLists.txt.in",
-                f"{complete_path}/CMakeLists.txt",
-                version,
-            )
-
-            # Configure package
-            my_logger.logger.info("configuring...")
-            subprocess.run(configure, check=True, cwd=complete_path)
-
-            # Check if already installed
             is_installed = is_package_installed(complete_path)
             if not is_installed:
-
-                # Build package
-                my_logger.logger.info("building...")
-                subprocess.run(build, check=True, cwd=complete_path)
-
-                # Install package
-                if install == "yes":
-                    my_logger.logger.info("installing...")
-                    subprocess.run(install, check=True, cwd=complete_path)
+                build_pkg(complete_path)
+                install_pkg(complete_path, install)
             else:
                 my_logger.logger.info("Package is already installed. Skipping.")
 
-            # Remove build dir
-            my_logger.logger.info("cleaning...")
-            shutil.rmtree(f"{complete_path}/build")
-            my_logger.logger.info("process complete.")
+            clean_env(complete_path)
