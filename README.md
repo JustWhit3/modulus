@@ -16,6 +16,7 @@
 - [Install and use](#install-and-use)
   - [Install](#install)
   - [Usage](#usage)
+- [Add new package](#add-new-package)
 - [Todo](#todo)
 - [Credits](#credits)
   - [Project leaders](#project-leaders)
@@ -38,6 +39,10 @@ Work in progress...
 Work in progress...
 
 ### Usage
+
+Work in progress...
+
+## Add new package
 
 Work in progress...
 
