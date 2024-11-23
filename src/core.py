@@ -45,9 +45,16 @@ def configure_pkg(path):
     subprocess.run(["cmake", "-B", "build"], check=True, cwd=path)
 
 
-def build_pkg(path):
-    my_logger.logger.info("building...")
-    subprocess.run(["cmake", "--build", "build"], check=True, cwd=path)
+def build_pkg(path, jobs):
+    parallel_jobs = [] if jobs == "max" else [str(jobs)]
+    job_info = "maximum" if not parallel_jobs else jobs
+    my_logger.logger.info(f"building with {job_info} jobs in parallel...")
+
+    subprocess.run(
+        ["cmake", "--build", "build", "--parallel", *parallel_jobs],
+        check=True,
+        cwd=path,
+    )
 
 
 def install_pkg(path, install):
@@ -64,19 +71,21 @@ def clean_env(path):
     my_logger.logger.info("process complete.")
 
 
-def install_package(base_path, package, version, install):
+def install_package(base_path, package, version, install, jobs):
+    package_path = os.path.join(base_path, package)
+    if not os.path.exists(package_path):
+        my_logger.logger.info(
+            f"Package '{package}' not found in {base_path}. Skipping."
+        )
+        return
 
-    for pkg in os.listdir(base_path):
-        if pkg == package:
-            complete_path = f"{base_path}/{pkg}"
-            generate_template(complete_path, version)
-            configure_pkg(complete_path)
+    generate_template(package_path, version)
+    configure_pkg(package_path)
 
-            is_installed = is_package_installed(complete_path)
-            if not is_installed:
-                build_pkg(complete_path)
-                install_pkg(complete_path, install)
-            else:
-                my_logger.logger.info("Package is already installed. Skipping.")
+    if not is_package_installed(package_path):
+        build_pkg(package_path, jobs)
+        install_pkg(package_path, install)
+    else:
+        my_logger.logger.info(f"Package '{package}' is already installed. Skipping.")
 
-            clean_env(complete_path)
+    clean_env(package_path)

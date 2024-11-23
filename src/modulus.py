@@ -10,11 +10,16 @@ import core
 
 def main():
     base_path = "packages"
+    cmake_version = "3.15.0"
 
+    my_shell.is_connected()
+    my_shell.check_minimum_cmake_version(cmake_version)
     core.check_if_in_archive(base_path, args.package)
 
     if my_shell.is_admin():
-        core.install_package(base_path, args.package, args.version, args.install)
+        core.install_package(
+            base_path, args.package, args.version, args.install, args.jobs
+        )
     else:
         my_logger.logger.error("admin privileges are required to install packages.")
 
@@ -43,6 +48,13 @@ if __name__ == "__main__":
         help="Choose if installing or not.",
         type=str,
         default="yes",
+    )
+    parser.add_argument(
+        "-j",
+        "--jobs",
+        help="Maximum number of jobs to build in parallel.",
+        type=str,
+        default="max",
     )
     args = parser.parse_args()
 

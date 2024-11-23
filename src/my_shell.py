@@ -1,5 +1,12 @@
+# STD modules
 import os
+import sys
 import ctypes
+import socket
+import subprocess
+
+# Personal modules
+import my_logger
 
 
 def is_admin():
@@ -8,13 +15,15 @@ def is_admin():
         try:
             return ctypes.windll.shell32.IsUserAnAdmin()
         except:
-            return False
+            my_logger.logger.error("unable get user admin information.")
+            sys.exit()
 
     # Linux/MacOS
     elif os.name == "posix":
         return os.geteuid() == 0
     else:
-        logger.error("unable to run Modulus, unsupported platform.")
+        my_logger.logger.error("unable to run Modulus, unsupported platform.")
+        sys.exit()
 
 
 def generate_cmakelists(template_path, output_path, version):
@@ -24,3 +33,39 @@ def generate_cmakelists(template_path, output_path, version):
 
     with open(output_path, "w") as file:
         file.write(content)
+
+
+def is_connected():
+    try:
+        socket.setdefaulttimeout(3)
+        socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect(("8.8.8.8", 53))
+        return True
+    except socket.error:
+        my_logger.logger.error(
+            "unable to run Modulus, there is no internet connection."
+        )
+        sys.exit()
+
+
+def check_minimum_cmake_version(required):
+    try:
+        result = subprocess.run(
+            ["cmake", "--version"],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            check=True,
+        )
+        output = result.stdout.strip()
+        version_line = output.splitlines()[0]
+        version = version_line.split()[2]
+        if version < required:
+            my_logger.logger.error(
+                f"required CMake version is {required}, but you have CMake {version} installed. Please upgrade the package."
+            )
+            sys.exit()
+    except (subprocess.CalledProcessError, IndexError, FileNotFoundError):
+        my_logger.logger.error(
+            "unable to get CMake version, check if CMake is installed."
+        )
+        sys.exit()
