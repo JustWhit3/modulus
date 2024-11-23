@@ -1,4 +1,4 @@
-<p align="center"><img src="https://github.com/JustWhit3/modulus/blob/main/img/logo_resized.png" height=220></p>
+<p align="center"><img src="https://github.com/JustWhit3/modulus/blob/main/img/logo_resized.png"></p>
 
 <h3 align="center">A simple and lightweight cross-platform C++ package manager written in Python and fully based on CMake</h3>
 <p align="center">
