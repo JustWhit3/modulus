@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Gianluca"
+  given-names: "Bianco"
+title: "modulus"
+version: 0.0.0
+doi: https://doi.org/10.5281/zenodo.14208855
+date-released: 2024-11-23
+url: "https://github.com/JustWhit3/modulus"
