@@ -4,6 +4,7 @@ import sys
 import ctypes
 import socket
 import subprocess
+import re
 
 # Personal modules
 import my_logger
@@ -69,3 +70,21 @@ def check_minimum_cmake_version(required):
             "unable to get CMake version, check if CMake is installed."
         )
         sys.exit()
+
+
+def find_github_link(base_path, package):
+    cmake_file_path = f"{base_path}/{package}/CMakeLists.txt"
+    try:
+        with open(cmake_file_path, "r", encoding="utf-8") as file:
+            content = file.read()
+
+        match = re.search(r'https://github\.com/[^\s"]+', content)
+        if match:
+            return match.group(0)
+        else:
+            return None
+    except FileNotFoundError:
+        my_logger.logger.error(f"Unable to find file: {cmake_file_path}")
+    except Exception as e:
+        my_logger.logger.error(f"Error while reading file {cmake_file_path}: {e}")
+    return None
