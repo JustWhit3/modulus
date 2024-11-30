@@ -1,5 +1,7 @@
 import logging
 
+logging.getLogger("urllib3").setLevel(logging.CRITICAL)
+
 
 class AnsiColoredFormatter(logging.Formatter):
     COLOR_MAP = {

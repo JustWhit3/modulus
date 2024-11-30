@@ -12,7 +12,8 @@ def main():
     base_path = "packages"
     cmake_version = "3.15.0"
 
-    print(my_shell.find_github_link(base_path, args.package))
+    if args.version == "0.0.0":
+        args.version = my_shell.get_latest_release(base_path, args.package)
 
     my_shell.is_connected()
     my_shell.check_minimum_cmake_version(cmake_version)

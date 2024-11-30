@@ -5,6 +5,7 @@ import ctypes
 import socket
 import subprocess
 import re
+import requests
 
 # Personal modules
 import my_logger
@@ -88,3 +89,23 @@ def find_github_link(base_path, package):
     except Exception as e:
         my_logger.logger.error(f"Error while reading file {cmake_file_path}: {e}")
     return None
+
+
+def get_latest_release(base_path, package):
+    repo_url = find_github_link(base_path, package)
+    try:
+        parts = repo_url.rstrip("/").split("/")
+        owner, repo = parts[-2], parts[-1]
+        api_url = f"https://api.github.com/repos/{owner}/{repo}/releases/latest"
+
+        response = requests.get(api_url)
+        response.raise_for_status()
+
+        release_data = response.json()
+        return release_data.get("tag_name", "No release tag found")
+    except requests.exceptions.RequestException as e:
+        my_logger.logger.error(
+            f"An error occurred while trying to get latest release of {package}: {e}"
+        )
+    except (IndexError, KeyError):
+        my_logger.logger.error(f"Invalid repository URL or format for {package}")
